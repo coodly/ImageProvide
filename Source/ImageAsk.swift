@@ -17,10 +17,10 @@
 import Foundation
 
 public class ImageAsk {
-    public let imageURL: NSURL
+    public let imageURL: URL
     public let atSize: CGSize
     
-    public init(imageURL: NSURL, atSize: CGSize = .zero) {
+    public init(imageURL: URL, atSize: CGSize = .zero) {
         self.imageURL = imageURL
         self.atSize = atSize
     }

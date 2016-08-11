@@ -23,12 +23,12 @@ public class ImageSource {
     
     public func hasImage(forAsk ask: ImageAsk) -> Bool {
         let path = localPathFor(ask)
-        return NSFileManager.defaultManager().fileExistsAtPath(path.path!)
+        return FileManager.default.fileExists(atPath: path.path)
     }
     
     public func image(forAsk ask: ImageAsk) -> UIImage? {
         let path = localPathFor(ask)
-        let data = NSData(contentsOfURL: path)!
+        let data = try! Data(contentsOf: path)
         return UIImage(data: data)!
     }
     
@@ -36,45 +36,45 @@ public class ImageSource {
         remoteFetch.fetchImage(forAsk: ask) {
             data, error in
             
-            guard let data = data, image = UIImage(data: data) else {
+            guard let data = data, image = UIImage(data: data as Data) else {
                 completion(nil)
                 return
             }
             
-            self.save(data, forAsk: ask)
+            self.save(data as Data, forAsk: ask)
             completion(image)
         }
     }
     
-    private func save(data: NSData, forAsk ask: ImageAsk) {
+    private func save(_ data: Data, forAsk ask: ImageAsk) {
         let path = localPathFor(ask)
         do {
-            try data.writeToURL(path, options: .AtomicWrite)
+            try data.write(to: path, options: .atomicWrite)
         } catch let error as NSError {
             print("Image save error: \(error)")
         }
     }
     
-    private func localPathFor(ask: ImageAsk) -> NSURL {
+    private func localPathFor(_ ask: ImageAsk) -> URL {
         let key = keyFor(ask)
-        return cachePath().URLByAppendingPathComponent(key)
+        return cachePath().appendingPathComponent(key)
     }
     
-    private func cachePath() -> NSURL {
-        let identifier = NSBundle.mainBundle().bundleIdentifier!
+    private func cachePath() -> URL {
+        let identifier = Bundle.main.bundleIdentifier!
         let cache = "\(identifier).images"
-        let cachesFolder = NSFileManager.defaultManager().URLsForDirectory(.CachesDirectory, inDomains: .UserDomainMask).last!
-        let imageCacheFolder = cachesFolder.URLByAppendingPathComponent(cache)
-        if !NSFileManager.defaultManager().fileExistsAtPath(imageCacheFolder.path!) {
+        let cachesFolder = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).last!
+        let imageCacheFolder = cachesFolder.appendingPathComponent(cache)
+        if !FileManager.default.fileExists(atPath: imageCacheFolder.path) {
             do {
-                try NSFileManager.defaultManager().createDirectoryAtURL(imageCacheFolder, withIntermediateDirectories: true, attributes: nil)
+                try FileManager.default.createDirectory(at: imageCacheFolder, withIntermediateDirectories: true, attributes: nil)
             } catch {}
         }
         
         return imageCacheFolder
     }
     
-    private func keyFor(ask: ImageAsk) -> String {
+    private func keyFor(_ ask: ImageAsk) -> String {
         let path = ask.imageURL.absoluteString
         let key: String
         if ask.atSize == .zero {
@@ -94,7 +94,7 @@ private extension String {
         var normalized = self
         
         for replace in String.replaced {
-            normalized = normalized.stringByReplacingOccurrencesOfString(replace, withString: "_")
+            normalized = normalized.replacingOccurrences(of: replace, with: "_")
         }
         
         return normalized
