@@ -32,8 +32,8 @@ public class ImageSource {
         return UIImage(data: data)!
     }
     
-    public func retrieveImage(forAsk ask: ImageAsk, completion:(UIImage?) -> ()) {
-        remoteFetch.fetchImage(forAsk: ask) {
+    public func retrieveImage(for ask: ImageAsk, completion:(UIImage?) -> ()) {
+        remoteFetch.fetchImage(for: ask) {
             data, error in
             
             guard let data = data, image = UIImage(data: data as Data) else {
