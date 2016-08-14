@@ -16,9 +16,12 @@
 
 import Foundation
 
+typealias AskCompletionClosure = (UIImage?) -> ()
+
 public class ImageAsk {
     public let imageURL: URL
     public let atSize: CGSize
+    var completions = [AskCompletionClosure]()
     
     public init(imageURL: URL, atSize: CGSize = .zero) {
         self.imageURL = imageURL

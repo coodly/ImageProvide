@@ -16,6 +16,10 @@
 
 public class ImageSource {
     private let remoteFetch: RemoteFetch
+    private var asks = [ImageAsk]()
+    private lazy var queue: DispatchQueue = {
+        return DispatchQueue(label: "Image ask queue")
+    }()
     
     public init(fetch: RemoteFetch) {
         remoteFetch = fetch
@@ -32,21 +36,44 @@ public class ImageSource {
         return UIImage(data: data)!
     }
     
-    public func retrieveImage(for ask: ImageAsk, completion:(UIImage?) -> ()) {
-        remoteFetch.fetchImage(for: ask) {
-            data, response, error in
-            
-            guard let data = data, image = UIImage(data: data as Data) else {
-                completion(nil)
+    public func retrieveImage(for ask: ImageAsk, completion: (UIImage?) -> ()) {
+        queue.async {
+            if let index = self.asks.index(where: { $0.imageURL == ask.imageURL }) {
+                let existing = self.asks[index]
+                existing.completions.append(completion)
                 return
             }
             
-            self.save(data as Data, forAsk: ask)
-            completion(image)
+            self.asks.append(ask)
+
+            let executed = ask
+            executed.completions.append(completion)
+            
+            self.remoteFetch.fetchImage(for: executed) {
+                data, response, error in
+                
+                self.queue.async {
+                    let index = self.asks.index(where: { $0.imageURL == executed.imageURL })!
+                    let completed = self.asks.remove(at: index)
+                    let completions = completed.completions
+                    
+                    guard let data = data, image = UIImage(data: data) else {
+                        for c in completions {
+                            c(nil)
+                        }
+                        return
+                    }
+                    
+                    self.save(data, for: executed)
+                    for c in completions {
+                        c(image)
+                    }
+                }
+            }
         }
     }
     
-    private func save(_ data: Data, forAsk ask: ImageAsk) {
+    private func save(_ data: Data, for ask: ImageAsk) {
         let path = localPathFor(ask)
         do {
             try data.write(to: path, options: .atomicWrite)
