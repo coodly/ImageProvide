@@ -17,5 +17,5 @@
 import Foundation
 
 public protocol RemoteFetch {
-    func fetchImage(for ask: ImageAsk, completion: (Data?, NSError?) -> ())
+    func fetchImage(for ask: ImageAsk, completion: (Data?, URLResponse?, Error?) -> ())
 }
