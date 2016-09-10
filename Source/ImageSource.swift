@@ -36,7 +36,7 @@ public class ImageSource {
         return UIImage(data: data)!
     }
     
-    public func retrieveImage(for ask: ImageAsk, completion: (UIImage?) -> ()) {
+    public func retrieveImage(for ask: ImageAsk, completion: @escaping (UIImage?) -> ()) {
         queue.async {
             if let index = self.asks.index(where: { $0.imageURL == ask.imageURL }) {
                 let existing = self.asks[index]
@@ -57,7 +57,7 @@ public class ImageSource {
                     let completed = self.asks.remove(at: index)
                     let completions = completed.completions
                     
-                    guard let data = data, image = UIImage(data: data) else {
+                    guard let data = data, let image = UIImage(data: data) else {
                         for c in completions {
                             c(nil)
                         }
