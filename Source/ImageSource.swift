@@ -52,6 +52,10 @@ public class ImageSource {
             self.remoteFetch.fetchImage(for: executed) {
                 data, response, error in
                 
+                if let error = error {
+                    Logging.log("Retrieve image error: \(error)")
+                }
+                
                 self.queue.async {
                     let index = self.asks.index(where: { $0.imageURL == executed.imageURL })!
                     let completed = self.asks.remove(at: index)
@@ -78,7 +82,7 @@ public class ImageSource {
         do {
             try data.write(to: path, options: .atomicWrite)
         } catch let error as NSError {
-            print("Image save error: \(error)")
+            Logging.log("Image save error: \(error)")
         }
     }
     
