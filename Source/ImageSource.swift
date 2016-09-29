@@ -57,7 +57,10 @@ public class ImageSource {
                 }
                 
                 self.queue.async {
-                    let index = self.asks.index(where: { $0.imageURL == executed.imageURL })!
+                    guard let index = self.asks.index(where: { $0.imageURL == executed.imageURL }) else {
+                        return
+                    }
+                    
                     let completed = self.asks.remove(at: index)
                     let completions = completed.completions
                     
