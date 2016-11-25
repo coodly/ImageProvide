@@ -17,9 +17,7 @@
 public class ImageSource {
     private let remoteFetch: RemoteFetch
     private var asks = [ImageAsk]()
-    private lazy var queue: DispatchQueue = {
-        return DispatchQueue(label: "Image ask queue")
-    }()
+    private let queue: DispatchQueue = DispatchQueue(label: "Image ask queue")
     
     public init(fetch: RemoteFetch) {
         remoteFetch = fetch
