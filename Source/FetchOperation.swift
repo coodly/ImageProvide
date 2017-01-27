@@ -29,33 +29,41 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
     }
     
     override func main() {
+        let callCompletionOnMain: ((UIImage?) -> ()) = {
+            image in
+            
+            DispatchQueue.main.async {
+                self.completion(image)
+                self.finish()
+            }
+        }
+        
         if hasImage(for: ask) {
-            let image = self.image(for: ask)
-            completion(image)
-            self.finish()
+            DispatchQueue.global(qos: .background).async {
+                let image = self.image(for: self.ask)
+                callCompletionOnMain(image)
+            }
             return
         }
         
         fetch.fetchImage(for: ask) {
             data, response, error in
             
-            defer {
-                self.finish()
-            }
-            
             if let error = error {
                 Logging.log("Retrieve image error: \(error)")
-                self.completion(nil)
+                callCompletionOnMain(nil)
                 return
             }
-            
-            guard let data = data, let image = UIImage(data: data) else {
-                self.completion(nil)
-                return
+
+            DispatchQueue.global(qos: .background).async {
+                guard let data = data, let image = UIImage(data: data) else {
+                    callCompletionOnMain(nil)
+                    return
+                }
+                
+                self.save(data, for: self.ask)
+                callCompletionOnMain(image)
             }
-            
-            self.save(data, for: self.ask)
-            self.completion(image)
         }
     }
 }
