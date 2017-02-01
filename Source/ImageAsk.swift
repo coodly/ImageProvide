@@ -26,4 +26,25 @@ public class ImageAsk {
         self.url = url
         self.action = after
     }
+    
+    internal func cacheKey(withActions: Bool = true) -> String {
+        let path = url.absoluteString
+        let key = path
+        return key.normalized()
+    }
 }
+
+private extension String {
+    static let replaced = [" ", ":", "/", "?", "=", "*"]
+    
+    func normalized() -> String {
+        var normalized = self
+        
+        for replace in String.replaced {
+            normalized = normalized.replacingOccurrences(of: replace, with: "_")
+        }
+        
+        return normalized
+    }
+}
+

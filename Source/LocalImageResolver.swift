@@ -36,7 +36,7 @@ public extension LocalImageResolver {
 
 internal extension LocalImageResolver {
     fileprivate func localPath(for ask: ImageAsk) -> URL {
-        let key = keyFor(ask)
+        let key = ask.cacheKey()
         return cachePath().appendingPathComponent(key)
     }
     
@@ -61,25 +61,5 @@ internal extension LocalImageResolver {
         } catch let error as NSError {
             Logging.log("Image save error: \(error)")
         }
-    }
-    
-    private func keyFor(_ ask: ImageAsk) -> String {
-        let path = ask.url.absoluteString
-        let key = path
-        return key.normalized()
-    }
-}
-
-private extension String {
-    static let replaced = [" ", ":", "/", "?", "=", "*"]
-    
-    func normalized() -> String {
-        var normalized = self
-        
-        for replace in String.replaced {
-            normalized = normalized.replacingOccurrences(of: replace, with: "_")
-        }
-        
-        return normalized
     }
 }
