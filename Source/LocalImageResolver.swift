@@ -38,11 +38,15 @@ internal extension LocalImageResolver {
     }
     
     internal func image(for key: CacheKey) -> UIImage? {
-        let path = localPath(for: key)
-        if let data = try? Data(contentsOf: path), let image = UIImage(data: data) {
+        if let data = data(for: key), let image = UIImage(data: data) {
             return image
         }
         return nil
+    }
+    
+    internal func data(for key: CacheKey) -> Data? {
+        let path = localPath(for: key)
+        return try? Data(contentsOf: path)
     }
 
     fileprivate func localPath(for key: CacheKey) -> URL {

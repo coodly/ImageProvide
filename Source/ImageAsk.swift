@@ -30,7 +30,10 @@ public class ImageAsk {
     
     internal func cacheKey(withActions: Bool = true) -> CacheKey {
         let path = url.absoluteString
-        let key = path
+        var key = path
+        if withActions, let action = action {
+            key = key.appendingFormat("#%@", action.key)
+        }
         return key.normalized()
     }
 }

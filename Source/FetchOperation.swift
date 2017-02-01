@@ -38,9 +38,33 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
             }
         }
         
-        if hasImage(for: ask) {
+        let processedKey = ask.cacheKey(withActions: true)
+        if hasImage(for: processedKey) {
             DispatchQueue.global(qos: .background).async {
-                let image = self.image(for: self.ask)
+                let image = self.image(for: processedKey)
+                callCompletionOnMain(image)
+            }
+            return
+        }
+        
+        let originalKey = ask.cacheKey(withActions: false)
+        if let action = ask.action, hasImage(for: originalKey) {
+            DispatchQueue.global(qos: .background).async {
+                var result: UIImage?
+                defer {
+                    callCompletionOnMain(result)
+                }
+                
+                guard let originalData = self.data(for: originalKey) else {
+                    return
+                }
+                
+                guard let processed = action.process(originalData), let image = UIImage(data: processed) else {
+                    result = UIImage(data: originalData)
+                    return
+                }
+                
+                self.save(processed, for: processedKey)
                 callCompletionOnMain(image)
             }
             return
