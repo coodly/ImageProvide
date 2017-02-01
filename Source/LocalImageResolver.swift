@@ -23,20 +23,29 @@ public protocol LocalImageResolver {
 
 public extension LocalImageResolver {
     func hasImage(for ask: ImageAsk) -> Bool {
-        let path = localPath(for: ask)
-        return FileManager.default.fileExists(atPath: path.path)
+        return hasImage(for: ask.cacheKey(withActions: true))
     }
     
     func image(for ask: ImageAsk) -> UIImage? {
-        let path = localPath(for: ask)
-        let data = try! Data(contentsOf: path)
-        return UIImage(data: data)!
+        return image(for: ask.cacheKey(withActions: true))
     }
 }
 
 internal extension LocalImageResolver {
-    fileprivate func localPath(for ask: ImageAsk) -> URL {
-        let key = ask.cacheKey()
+    internal func hasImage(for key: CacheKey) -> Bool {
+        let path = localPath(for: key)
+        return FileManager.default.fileExists(atPath: path.path)
+    }
+    
+    internal func image(for key: CacheKey) -> UIImage? {
+        let path = localPath(for: key)
+        if let data = try? Data(contentsOf: path), let image = UIImage(data: data) {
+            return image
+        }
+        return nil
+    }
+
+    fileprivate func localPath(for key: CacheKey) -> URL {
         return cachePath().appendingPathComponent(key)
     }
     
@@ -54,8 +63,8 @@ internal extension LocalImageResolver {
         return imageCacheFolder
     }
     
-    internal func save(_ data: Data, for ask: ImageAsk) {
-        let path = localPath(for: ask)
+    internal func save(_ data: Data, for key: CacheKey) {
+        let path = localPath(for: key)
         do {
             try data.write(to: path, options: .atomicWrite)
         } catch let error as NSError {

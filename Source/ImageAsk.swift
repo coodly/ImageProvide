@@ -16,7 +16,8 @@
 
 import Foundation
 
-typealias AskCompletionClosure = (UIImage?) -> ()
+internal typealias AskCompletionClosure = (UIImage?) -> ()
+internal typealias CacheKey = String
 
 public class ImageAsk {
     public let url: URL
@@ -27,7 +28,7 @@ public class ImageAsk {
         self.action = after
     }
     
-    internal func cacheKey(withActions: Bool = true) -> String {
+    internal func cacheKey(withActions: Bool = true) -> CacheKey {
         let path = url.absoluteString
         let key = path
         return key.normalized()
