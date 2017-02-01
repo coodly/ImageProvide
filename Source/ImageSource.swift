@@ -20,10 +20,16 @@ public class ImageSource: LocalImageResolver {
     private let remoteFetch: RemoteFetch
     private var asks = [ImageAsk]()
     private let queue: DispatchQueue = DispatchQueue(label: "Image ask queue")
-    private let operationsQueue: OperationQueue = {
+    private let retrieveQueue: OperationQueue = {
         let queue = OperationQueue()
         queue.name = "Image fetch operations queue"
         queue.qualityOfService = .utility
+        return queue
+    }()
+    private let processQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.name = "Image process queue"
+        queue.qualityOfService = .userInitiated
         return queue
     }()
     
@@ -31,8 +37,14 @@ public class ImageSource: LocalImageResolver {
         remoteFetch = fetch
     }
     
-    public func retrieveImage(for ask: ImageAsk, completion: @escaping (UIImage?) -> ()) {
+    public func retrieveImage(for ask: ImageAsk, completion: @escaping (UIImage?) -> ()) -> Bool {
         let op = FetchOperation(fetch: remoteFetch, ask: ask, completion: completion)
-        operationsQueue.addOperation(op)
+        if hasImage(for: ask) {
+            processQueue.addOperation(op)
+            return true
+        } else {
+            retrieveQueue.addOperation(op)
+            return false
+        }
     }
 }
