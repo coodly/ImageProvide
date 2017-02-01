@@ -37,6 +37,7 @@ public class ImageSource: LocalImageResolver {
         remoteFetch = fetch
     }
     
+    @discardableResult
     public func retrieveImage(for ask: ImageAsk, completion: @escaping (UIImage?) -> ()) -> Bool {
         let op = FetchOperation(fetch: remoteFetch, ask: ask, completion: completion)
         if hasImage(for: ask) {
