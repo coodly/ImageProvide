@@ -17,5 +17,6 @@
 import Foundation
 
 public protocol AfterAction {
-    
+    var key: String { get }
+    func process(_ data: Data, completion: @escaping ((Data?) -> ()))
 }
