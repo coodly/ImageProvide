@@ -16,14 +16,6 @@
 
 import Foundation
 
-typealias AskCompletionClosure = (UIImage?) -> ()
-
-public class ImageAsk {
-    public let url: URL
-    internal let action: AfterAction?
+public protocol AfterAction {
     
-    public init(url: URL, after: AfterAction? = nil) {
-        self.url = url
-        self.action = after
-    }
 }

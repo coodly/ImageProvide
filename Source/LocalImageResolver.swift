@@ -64,14 +64,8 @@ internal extension LocalImageResolver {
     }
     
     private func keyFor(_ ask: ImageAsk) -> String {
-        let path = ask.imageURL.absoluteString
-        let key: String
-        if ask.atSize == .zero {
-            key = path
-        } else {
-            key = "\(path)@\(ask.atSize.width)x\(ask.atSize.width)"
-        }
-        
+        let path = ask.url.absoluteString
+        let key = path
         return key.normalized()
     }
 }
