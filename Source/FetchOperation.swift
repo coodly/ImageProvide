@@ -65,7 +65,7 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
                 }
                 
                 self.save(processed, for: processedKey)
-                callCompletionOnMain(image)
+                result = image
             }
             return
         }
