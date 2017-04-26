@@ -19,7 +19,6 @@ internal typealias ImageClosure = ((UIImage?) -> ())
 public class ImageSource: LocalImageResolver {
     private let remoteFetch: RemoteFetch
     private var asks = [ImageAsk]()
-    private let queue: DispatchQueue = DispatchQueue(label: "Image ask queue")
     private let retrieveQueue: OperationQueue = {
         let queue = OperationQueue()
         queue.name = "Image fetch operations queue"
