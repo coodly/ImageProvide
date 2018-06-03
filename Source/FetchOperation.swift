@@ -19,7 +19,7 @@ import UIKit
 
 internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
     private let fetch: RemoteFetch
-    private let ask: ImageAsk
+    internal let ask: ImageAsk
     private let completion: ImageClosure
     
     init(fetch: RemoteFetch, ask: ImageAsk, completion: @escaping ImageClosure) {

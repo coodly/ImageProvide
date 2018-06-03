@@ -22,6 +22,7 @@ internal typealias CacheKey = String
 public class ImageAsk {
     public let url: URL
     internal let action: AfterAction?
+    public var placeholderAsk: ImageAsk?
     
     public init(url: URL, after: AfterAction? = nil) {
         self.url = url

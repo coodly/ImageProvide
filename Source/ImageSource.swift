@@ -38,13 +38,30 @@ public class ImageSource: LocalImageResolver {
     
     @discardableResult
     public func retrieveImage(for ask: ImageAsk, completion: @escaping (UIImage?) -> ()) -> Bool {
-        let op = FetchOperation(fetch: remoteFetch, ask: ask, completion: completion)
+        var haveLocalImage = false
+
+        let placeholderOperation: FetchOperation?
         if hasImage(for: ask) {
-            processQueue.addOperation(op)
-            return true
+            placeholderOperation = nil
+            haveLocalImage = true
+        } else if let placeholder = ask.placeholderAsk {
+            placeholderOperation = FetchOperation(fetch: remoteFetch, ask: placeholder, completion: completion)
         } else {
-            retrieveQueue.addOperation(op)
-            return false
+            placeholderOperation = nil
         }
+        let imageOperation = FetchOperation(fetch: remoteFetch, ask: ask, completion: completion)
+        
+        if let placeholder = placeholderOperation {
+            imageOperation.addDependency(placeholder)
+        }
+        
+        let operations: [FetchOperation] = [placeholderOperation, imageOperation].compactMap({ $0 })
+        let runOnProcess = operations.filter({ hasImage(for: $0.ask) })
+        let runOnRetrieve = operations.filter({ !hasImage(for: $0.ask )})
+        
+        processQueue.addOperations(runOnProcess, waitUntilFinished: false)
+        retrieveQueue.addOperations(runOnRetrieve, waitUntilFinished: false)
+        
+        return haveLocalImage
     }
 }
