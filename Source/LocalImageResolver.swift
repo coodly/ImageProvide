@@ -16,6 +16,24 @@
 
 import Foundation
 
+private class CachePath {
+    fileprivate static let path: URL = {
+        let identifier = Bundle.main.bundleIdentifier!
+        let cache = "\(identifier).images"
+        let cachesFolder = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).last!
+        let imageCacheFolder = cachesFolder.appendingPathComponent(cache)
+        if !FileManager.default.fileExists(atPath: imageCacheFolder.path) {
+            do {
+                try FileManager.default.createDirectory(at: imageCacheFolder, withIntermediateDirectories: true, attributes: nil)
+            } catch {}
+        }
+        
+        Logging.log("Images cache at \(imageCacheFolder.absoluteString)")
+        
+        return imageCacheFolder
+    }()
+}
+
 public protocol LocalImageResolver {
     func hasImage(for ask: ImageAsk) -> Bool
     func image(for ask: ImageAsk) -> UIImage?
@@ -54,17 +72,7 @@ internal extension LocalImageResolver {
     }
     
     private func cachePath() -> URL {
-        let identifier = Bundle.main.bundleIdentifier!
-        let cache = "\(identifier).images"
-        let cachesFolder = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).last!
-        let imageCacheFolder = cachesFolder.appendingPathComponent(cache)
-        if !FileManager.default.fileExists(atPath: imageCacheFolder.path) {
-            do {
-                try FileManager.default.createDirectory(at: imageCacheFolder, withIntermediateDirectories: true, attributes: nil)
-            } catch {}
-        }
-        
-        return imageCacheFolder
+        return CachePath.path
     }
     
     internal func save(_ data: Data, for key: CacheKey) {
