@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'ImageProvide'
-  s.version = '0.4.0'
+  s.version = '0.4.1'
   s.license = 'Apache 2'
   s.summary = 'Simple image cache'
   s.homepage = 'https://github.com/coodly/ImageProvide'
