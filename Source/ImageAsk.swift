@@ -16,6 +16,7 @@
 
 import Foundation
 import CommonCrypto
+import UIKit
 
 internal typealias AskCompletionClosure = (UIImage?) -> ()
 internal typealias CacheKey = String

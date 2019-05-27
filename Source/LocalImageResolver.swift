@@ -49,7 +49,7 @@ public extension LocalImageResolver {
     }
 }
 
-internal extension LocalImageResolver {
+extension LocalImageResolver {
     internal func hasImage(for key: CacheKey) -> Bool {
         let path = localPath(for: key)
         return FileManager.default.fileExists(atPath: path.path)
