@@ -72,9 +72,9 @@ private extension String {
             return nil
         }
         
-        let hash = data.withUnsafeBytes { (bytes: UnsafePointer<Data>) -> [UInt8] in
+        let hash = data.withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> [UInt8] in
             var hash: [UInt8] = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
-            CC_MD5(bytes, CC_LONG(data.count), &hash)
+            CC_MD5(bytes.baseAddress, CC_LONG(data.count), &hash)
             return hash
         }
         
