@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '9.0'
   s.tvos.deployment_target = '9.0'
 
-  s.source_files = 'Source/*.swift'
+  s.source_files = 'Source/ImageProvide/*.swift'
 
   s.requires_arc = true
 end

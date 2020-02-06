@@ -15,6 +15,7 @@
  */
 
 import Foundation
+import UIKit
 
 private class CachePath {
     fileprivate static let path: URL = {

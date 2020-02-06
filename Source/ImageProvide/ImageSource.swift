@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import UIKit
+
 internal typealias ImageClosure = ((UIImage?) -> ())
 
 public class ImageSource: LocalImageResolver {
