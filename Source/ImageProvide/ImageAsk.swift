@@ -16,9 +16,8 @@
 
 import Foundation
 import CommonCrypto
-import UIKit
 
-internal typealias AskCompletionClosure = (UIImage?) -> ()
+internal typealias AskCompletionClosure = (PlatformImage?) -> ()
 internal typealias CacheKey = String
 
 public class ImageAsk {

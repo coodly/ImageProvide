@@ -15,7 +15,6 @@
  */
 
 import Foundation
-import UIKit
 
 private class CachePath {
     fileprivate static let path: URL = {
@@ -37,7 +36,7 @@ private class CachePath {
 
 public protocol LocalImageResolver {
     func hasImage(for ask: ImageAsk) -> Bool
-    func image(for ask: ImageAsk) -> UIImage?
+    func image(for ask: ImageAsk) -> PlatformImage?
 }
 
 public extension LocalImageResolver {
@@ -45,7 +44,7 @@ public extension LocalImageResolver {
         return hasImage(for: ask.cacheKey(withActions: true))
     }
     
-    func image(for ask: ImageAsk) -> UIImage? {
+    func image(for ask: ImageAsk) -> PlatformImage? {
         return image(for: ask.cacheKey(withActions: true))
     }
 }
@@ -56,8 +55,8 @@ extension LocalImageResolver {
         return FileManager.default.fileExists(atPath: path.path)
     }
     
-    internal func image(for key: CacheKey) -> UIImage? {
-        if let data = data(for: key), let image = UIImage(data: data) {
+    internal func image(for key: CacheKey) -> PlatformImage? {
+        if let data = data(for: key), let image = ImageCreate.image(from: data) {
             return image
         }
         return nil

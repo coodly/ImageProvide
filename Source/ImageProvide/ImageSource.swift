@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 
+#if canImport(UIKit)
 import UIKit
+public typealias PlatformImage = UIImage
+#elseif canImport(AppKit)
+import AppKit
+public typealias PlatformImage = NSImage
+#endif
 
-internal typealias ImageClosure = ((UIImage?) -> ())
+internal typealias ImageClosure = ((PlatformImage?) -> ())
 
 public class ImageSource: LocalImageResolver {
     private let remoteFetch: RemoteFetch
@@ -39,7 +45,7 @@ public class ImageSource: LocalImageResolver {
     }
     
     @discardableResult
-    public func retrieveImage(for ask: ImageAsk, completion: @escaping (UIImage?) -> ()) -> Bool {
+    public func retrieveImage(for ask: ImageAsk, completion: @escaping (PlatformImage?) -> ()) -> Bool {
         var haveLocalImage = false
 
         let placeholderOperation: FetchOperation?

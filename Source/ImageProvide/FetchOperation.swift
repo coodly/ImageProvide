@@ -15,7 +15,6 @@
  */
 
 import Foundation
-import UIKit
 
 internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
     private let fetch: RemoteFetch
@@ -29,7 +28,7 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
     }
     
     override func main() {
-        let callCompletionOnMain: ((UIImage?) -> ()) = {
+        let callCompletionOnMain: ((PlatformImage?) -> ()) = {
             image in
             
             DispatchQueue.main.async {
@@ -50,7 +49,7 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
         let originalKey = ask.cacheKey(withActions: false)
         if let action = ask.action, hasImage(for: originalKey) {
             DispatchQueue.global(qos: .background).async {
-                var result: UIImage?
+                var result: PlatformImage?
                 defer {
                     callCompletionOnMain(result)
                 }
@@ -59,8 +58,8 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
                     return
                 }
                 
-                guard let processed = action.process(originalData), let image = UIImage(data: processed) else {
-                    result = UIImage(data: originalData)
+                guard let processed = action.process(originalData), let image = ImageCreate.image(from: processed) else {
+                    result = ImageCreate.image(from: originalData)
                     return
                 }
                 
@@ -80,7 +79,7 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
             }
 
             DispatchQueue.global(qos: .background).async {
-                var result: UIImage?
+                var result: PlatformImage?
                 defer {
                     callCompletionOnMain(result)
                 }
@@ -90,12 +89,12 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
                 }
                 
                 // checking that have valid image data for caching
-                if let original = UIImage(data: data) {
+                if let original = ImageCreate.image(from: data) {
                     result = original
                     self.save(data, for: self.ask.cacheKey(withActions: false))
                 }
                 
-                if let action = self.ask.action, let processed = action.process(data), let created = UIImage(data: processed) {
+                if let action = self.ask.action, let processed = action.process(data), let created = ImageCreate.image(from: processed) {
                     result = created
                     self.save(processed, for: self.ask.cacheKey(withActions: true))
                 }
