@@ -52,7 +52,7 @@ public class ImageSource: LocalImageResolver {
         if hasImage(for: ask) {
             placeholderOperation = nil
             haveLocalImage = true
-        } else if let placeholder = ask.placeholderAsk {
+        } else if let placeholder = ask.placeholder {
             placeholderOperation = FetchOperation(fetch: remoteFetch, ask: placeholder, completion: completion)
         } else {
             placeholderOperation = nil

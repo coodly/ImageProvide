@@ -21,22 +21,42 @@ internal typealias AskCompletionClosure = (PlatformImage?) -> ()
 internal typealias CacheKey = String
 
 public class ImageAsk {
-    public let url: URL
-    internal let action: AfterAction?
-    public var placeholderAsk: ImageAsk?
-    
-    public init(url: URL, after: AfterAction? = nil) {
+    internal var actions = [AfterAction]()
+
+    internal let url: URL
+    internal let placeholder: ImageAsk?
+    public init(url: URL, placeholder: ImageAsk? = nil) {
         self.url = url
-        self.action = after
+        self.placeholder = placeholder
+    }
+    
+    private init(url: URL, placeholder: ImageAsk?, actions: [AfterAction]) {
+        self.url = url
+        self.placeholder = placeholder
+        self.actions = actions
     }
     
     internal func cacheKey(withActions: Bool = true) -> CacheKey {
         let path = url.absoluteString
         var key = path
-        if withActions, let action = action {
-            key = key.appendingFormat("#%@", action.key)
+        actions.forEach() {
+            key = key.appendingFormat("#%@", $0.key)
         }
         return key.normalized()
+    }
+    
+    public func append(action: AfterAction) {
+        actions.append(action)
+    }
+    
+    internal var actionSteps: [ImageAsk] {
+        var steps = [ImageAsk]()
+        for index in 0...actions.count {
+            let actions = Array(self.actions.prefix(index))
+            steps.append(ImageAsk(url: url, placeholder: placeholder, actions: actions))
+        }
+        
+        return steps
     }
 }
 

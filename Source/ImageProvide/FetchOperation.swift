@@ -46,28 +46,31 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
             return
         }
         
-        let originalKey = ask.cacheKey(withActions: false)
-        if let action = ask.action, hasImage(for: originalKey) {
-            DispatchQueue.global(qos: .background).async {
-                var result: PlatformImage?
-                defer {
-                    callCompletionOnMain(result)
+        let steps = ask.actionSteps
+        let reversed = steps.reversed()
+        /*for step in reversed {
+            if hasImage(for: step.cacheKey()) {
+                DispatchQueue.global(qos: .background).async {
+                    var result: PlatformImage?
+                    defer {
+                        callCompletionOnMain(result)
+                    }
+                    
+                    guard let originalData = self.data(for: originalKey) else {
+                        return
+                    }
+                    
+                    guard let processed = action.process(originalData), let image = ImageCreate.image(from: processed) else {
+                        result = ImageCreate.image(from: originalData)
+                        return
+                    }
+                    
+                    self.save(processed, for: processedKey)
+                    result = image
                 }
-                
-                guard let originalData = self.data(for: originalKey) else {
-                    return
-                }
-                
-                guard let processed = action.process(originalData), let image = ImageCreate.image(from: processed) else {
-                    result = ImageCreate.image(from: originalData)
-                    return
-                }
-                
-                self.save(processed, for: processedKey)
-                result = image
+                return
             }
-            return
-        }
+        }*/
         
         fetch.fetchImage(for: ask) {
             data, response, error in
@@ -94,10 +97,10 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
                     self.save(data, for: self.ask.cacheKey(withActions: false))
                 }
                 
-                if let action = self.ask.action, let processed = action.process(data), let created = ImageCreate.image(from: processed) {
+                /*if let action = self.ask.action, let processed = action.process(data), let created = ImageCreate.image(from: processed) {
                     result = created
                     self.save(processed, for: self.ask.cacheKey(withActions: true))
-                }
+                }*/
             }
         }
     }
