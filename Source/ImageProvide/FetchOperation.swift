@@ -37,7 +37,7 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
             }
         }
         
-        let processedKey = ask.cacheKey(withActions: true)
+        let processedKey = ask.cacheKey
         if hasImage(for: processedKey) {
             DispatchQueue.global(qos: .background).async {
                 let image = self.image(for: processedKey)
@@ -46,9 +46,9 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
             return
         }
         
-        let steps = ask.actionSteps
+        /*let steps = ask.actionChain
         let reversed = steps.reversed()
-        /*for step in reversed {
+        for step in reversed {
             if hasImage(for: step.cacheKey()) {
                 DispatchQueue.global(qos: .background).async {
                     var result: PlatformImage?
@@ -94,7 +94,7 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
                 // checking that have valid image data for caching
                 if let original = ImageCreate.image(from: data) {
                     result = original
-                    self.save(data, for: self.ask.cacheKey(withActions: false))
+                    self.save(data, for: self.ask.cacheKey)
                 }
                 
                 /*if let action = self.ask.action, let processed = action.process(data), let created = ImageCreate.image(from: processed) {

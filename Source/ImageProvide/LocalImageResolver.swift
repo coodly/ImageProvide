@@ -41,11 +41,11 @@ public protocol LocalImageResolver {
 
 public extension LocalImageResolver {
     func hasImage(for ask: ImageAsk) -> Bool {
-        return hasImage(for: ask.cacheKey(withActions: true))
+        return hasImage(for: ask.cacheKey)
     }
     
     func image(for ask: ImageAsk) -> PlatformImage? {
-        return image(for: ask.cacheKey(withActions: true))
+        return image(for: ask.cacheKey)
     }
 }
 

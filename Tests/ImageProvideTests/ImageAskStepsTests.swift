@@ -6,7 +6,7 @@ final class ImageAskStepsTests: XCTestCase {
     
     func testStepsWithNoActions() {
         let ask = ImageAsk(url: askURL)
-        let steps = ask.actionSteps
+        let steps = ask.actionChain.steps
         XCTAssertEqual(1, steps.count)
     }
 
@@ -15,18 +15,18 @@ final class ImageAskStepsTests: XCTestCase {
                 .scaled(to: .zero, mode: .aspectFill)
                 .scaled(to: .zero, mode: .aspectFit)
                 
-        let steps = ask.actionSteps
+        let steps = ask.actionChain.steps
         XCTAssertEqual(3, steps.count)
         
-        XCTAssertEqual(0, steps[0].actions.count)
-        XCTAssertEqual(1, steps[1].actions.count)
-        XCTAssertEqual(2, steps[2].actions.count)
+        XCTAssertEqual(0, steps[0].actionsCount)
+        XCTAssertEqual(1, steps[1].actionsCount)
+        XCTAssertEqual(2, steps[2].actionsCount)
     }
     
     func testPlacholderForwarded() {
         let ask = ImageAsk(url: askURL, placeholder: ImageAsk(url: URL(string: "placeholder://poster")!))
                 .scaled(to: .zero, mode: .aspectFill)
         
-        XCTAssertNotNil(ask.actionSteps.last?.placeholder)
+        XCTAssertNotNil(ask.actionChain.steps.last?.placeholder)
     }
 }
