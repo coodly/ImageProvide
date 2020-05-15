@@ -18,5 +18,5 @@ import Foundation
 
 public protocol AfterAction {
     var key: String { get }
-    func process(_ data: Data) -> Data?
+    func process(_ image: PlatformImage) -> PlatformImage?
 }

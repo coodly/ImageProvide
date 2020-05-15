@@ -25,8 +25,12 @@ public class ImageAsk {
     internal var actionsCount: Int {
         actions.count
     }
+    internal var preceding: ImageAsk?
+    internal var lastAction: AfterAction? {
+        actions.last
+    }
 
-    internal let url: URL
+    public let url: URL
     internal let placeholder: ImageAsk?
     public init(url: URL, placeholder: ImageAsk? = nil) {
         self.url = url
@@ -56,7 +60,9 @@ public class ImageAsk {
         var steps = [ImageAsk]()
         for index in 0...actions.count {
             let actions = Array(self.actions.prefix(index))
-            steps.append(ImageAsk(url: url, placeholder: placeholder, actions: actions))
+            let current = ImageAsk(url: url, placeholder: placeholder, actions: actions)
+            current.preceding = steps.last
+            steps.append(current)
         }
         
         return ActionsChain(steps: steps)

@@ -40,7 +40,9 @@ internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
             return
         }
         
-        process(chain: ask.actionChain)
+        let chain = ask.actionChain
+        chain.repository = repository
+        process(chain: chain)
     }
     
     private func process(chain: ActionsChain, withFetch: Bool = true) {
