@@ -28,7 +28,7 @@ private class CachePath {
             } catch {}
         }
         
-        Logging.log("Images cache at \(imageCacheFolder.absoluteString)")
+        Logging.debug("Images cache at \(imageCacheFolder.absoluteString)")
         
         return imageCacheFolder
     }()
@@ -41,11 +41,11 @@ public protocol LocalImageResolver {
 
 public extension LocalImageResolver {
     func hasImage(for ask: ImageAsk) -> Bool {
-        return hasImage(for: ask.cacheKey(withActions: true))
+        return hasImage(for: ask.cacheKey)
     }
     
     func image(for ask: ImageAsk) -> PlatformImage? {
-        return image(for: ask.cacheKey(withActions: true))
+        return image(for: ask.cacheKey)
     }
 }
 
@@ -80,7 +80,7 @@ extension LocalImageResolver {
         do {
             try data.write(to: path, options: .atomicWrite)
         } catch let error as NSError {
-            Logging.log("Image save error: \(error)")
+            Logging.error("Image save error: \(error)")
         }
     }
 }

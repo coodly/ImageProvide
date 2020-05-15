@@ -39,6 +39,7 @@ public class ImageSource: LocalImageResolver {
         queue.qualityOfService = .userInitiated
         return queue
     }()
+    private lazy var repository = LocalRepository()
     
     public init(fetch: RemoteFetch) {
         remoteFetch = fetch
@@ -52,12 +53,12 @@ public class ImageSource: LocalImageResolver {
         if hasImage(for: ask) {
             placeholderOperation = nil
             haveLocalImage = true
-        } else if let placeholder = ask.placeholderAsk {
-            placeholderOperation = FetchOperation(fetch: remoteFetch, ask: placeholder, completion: completion)
+        } else if let placeholder = ask.placeholder {
+            placeholderOperation = FetchOperation(fetch: remoteFetch, ask: placeholder, repository: repository, completion: completion)
         } else {
             placeholderOperation = nil
         }
-        let imageOperation = FetchOperation(fetch: remoteFetch, ask: ask, completion: completion)
+        let imageOperation = FetchOperation(fetch: remoteFetch, ask: ask, repository: repository, completion: completion)
         
         if let placeholder = placeholderOperation {
             imageOperation.addDependency(placeholder)
