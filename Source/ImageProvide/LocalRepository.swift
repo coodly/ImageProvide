@@ -1,5 +1,5 @@
 /*
-* Copyright 2016 Coodly LLC
+* Copyright 2020 Coodly LLC
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,17 +16,6 @@
 
 import Foundation
 
-internal class ActionsChain {
-    internal let steps: [ImageAsk]
-    internal init(steps: [ImageAsk]) {
-        self.steps = steps
-    }
+internal class LocalRepository: LocalImageResolver {
     
-    internal func canResolveIn(repository: LocalRepository) -> Bool {
-        repository.hasImage(for: steps.first!.cacheKey)
-    }
-    
-    internal func process(completion: ((PlatformImage?) -> Void)) {
-        
-    }
 }

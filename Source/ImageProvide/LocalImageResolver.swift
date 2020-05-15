@@ -28,7 +28,7 @@ private class CachePath {
             } catch {}
         }
         
-        Logging.log("Images cache at \(imageCacheFolder.absoluteString)")
+        Logging.debug("Images cache at \(imageCacheFolder.absoluteString)")
         
         return imageCacheFolder
     }()
@@ -80,7 +80,7 @@ extension LocalImageResolver {
         do {
             try data.write(to: path, options: .atomicWrite)
         } catch let error as NSError {
-            Logging.log("Image save error: \(error)")
+            Logging.error("Image save error: \(error)")
         }
     }
 }

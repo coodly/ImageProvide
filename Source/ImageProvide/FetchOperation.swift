@@ -18,90 +18,68 @@ import Foundation
 
 internal class FetchOperation: ConcurrentOperation, LocalImageResolver {
     private let fetch: RemoteFetch
+    private let repository: LocalRepository
     internal let ask: ImageAsk
     private let completion: ImageClosure
     
-    init(fetch: RemoteFetch, ask: ImageAsk, completion: @escaping ImageClosure) {
+    init(fetch: RemoteFetch, ask: ImageAsk, repository: LocalRepository, completion: @escaping ImageClosure) {
         self.fetch = fetch
         self.ask = ask
+        self.repository = repository
         self.completion = completion
     }
     
     override func main() {
-        let callCompletionOnMain: ((PlatformImage?) -> ()) = {
-            image in
-            
-            DispatchQueue.main.async {
-                self.completion(image)
-                self.finish()
-            }
-        }
-        
         let processedKey = ask.cacheKey
         if hasImage(for: processedKey) {
+            Logging.verbose("Fetch local processed image")
             DispatchQueue.global(qos: .background).async {
                 let image = self.image(for: processedKey)
-                callCompletionOnMain(image)
+                self.completeOnMain(with: image)
             }
             return
         }
         
-        /*let steps = ask.actionChain
-        let reversed = steps.reversed()
-        for step in reversed {
-            if hasImage(for: step.cacheKey()) {
-                DispatchQueue.global(qos: .background).async {
-                    var result: PlatformImage?
-                    defer {
-                        callCompletionOnMain(result)
-                    }
-                    
-                    guard let originalData = self.data(for: originalKey) else {
-                        return
-                    }
-                    
-                    guard let processed = action.process(originalData), let image = ImageCreate.image(from: processed) else {
-                        result = ImageCreate.image(from: originalData)
-                        return
-                    }
-                    
-                    self.save(processed, for: processedKey)
-                    result = image
-                }
-                return
-            }
-        }*/
-        
+        process(chain: ask.actionChain)
+    }
+    
+    private func process(chain: ActionsChain, withFetch: Bool = true) {
+        if chain.canResolveIn(repository: repository) {
+            Logging.debug("Can resolve locally")
+            chain.process(completion: completeOnMain(with:))
+        } else if withFetch, let first = chain.steps.first {
+            Logging.verbose("No local data. Pull")
+            remoteFetch(of: first, chain: chain)
+        } else {
+            Logging.error("No data and no pull")
+        }
+    }
+    
+    private func remoteFetch(of ask: ImageAsk, chain: ActionsChain) {
         fetch.fetchImage(for: ask) {
             data, response, error in
             
             if let error = error {
-                Logging.log("Retrieve image error: \(error)")
-                callCompletionOnMain(nil)
+                Logging.error("Fetch data error: \(error)")
+                self.completeOnMain(with: nil)
                 return
             }
-
-            DispatchQueue.global(qos: .background).async {
-                var result: PlatformImage?
-                defer {
-                    callCompletionOnMain(result)
-                }
-
-                guard let data = data else {
-                    return
-                }
-                
-                // checking that have valid image data for caching
-                if let original = ImageCreate.image(from: data) {
-                    result = original
-                    self.save(data, for: self.ask.cacheKey)
-                }
-                
-                /*if let action = self.ask.action, let processed = action.process(data), let created = ImageCreate.image(from: processed) {
-                    result = created
-                    self.save(processed, for: self.ask.cacheKey(withActions: true))
-                }*/
+            
+            guard let data = data else {
+                Logging.error("No data fetched")
+                self.completeOnMain(with: nil)
+                return
             }
+            
+            self.save(data, for: ask.cacheKey)
+            self.process(chain: chain, withFetch: false)
+        }
+    }
+    
+    private func completeOnMain(with image: PlatformImage?) {
+        DispatchQueue.main.async {
+            self.completion(image)
+            self.finish()
         }
     }
 }

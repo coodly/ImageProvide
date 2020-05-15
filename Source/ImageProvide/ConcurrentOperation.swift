@@ -60,7 +60,7 @@ internal class ConcurrentOperation: Operation {
         }
         
         if completionBlock != nil {
-            Logging.log("Existing completion block. Will not add own handling")
+            Logging.verbose("Existing completion block. Will not add own handling")
         } else {
             completionBlock = {
                 [unowned self] in
