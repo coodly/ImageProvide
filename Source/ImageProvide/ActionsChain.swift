@@ -15,6 +15,9 @@
 */
 
 import Foundation
+#if canImport(AppKit)
+import AppKit
+#endif
 
 internal class ActionsChain {
     internal let steps: [ImageAsk]
@@ -63,6 +66,7 @@ internal class ActionsChain {
         }
         
         let saved: Data?
+        #if os(iOS)
         switch data.imageContentType {
         case .jpg:
             saved = processed.jpegData(compressionQuality: 0.8)
@@ -72,6 +76,23 @@ internal class ActionsChain {
             Logging.error("Unhandled content type: \(data.imageContentType)")
             saved = nil
         }
+        #elseif os(macOS)
+        guard let ref = processed.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            return
+        }
+        
+        let bitmap = NSBitmapImageRep(cgImage: ref)
+        bitmap.size = processed.size
+        switch data.imageContentType {
+        case .jpg:
+            saved = bitmap.representation(using: .jpeg, properties: [:])
+        case .png:
+            saved = bitmap.representation(using: .png, properties: [:])
+        default:
+            Logging.error("Unhandled content type: \(data.imageContentType)")
+            saved = nil
+        }
+        #endif
         
         guard let written = saved else {
             return
