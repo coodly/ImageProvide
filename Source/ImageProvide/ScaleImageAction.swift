@@ -14,6 +14,7 @@
 * limitations under the License.
 */
 
+#if os(iOS)
 import Foundation
 import CoreGraphics
 import UIKit
@@ -92,3 +93,4 @@ extension ImageAsk {
         return self
     }
 }
+#endif
