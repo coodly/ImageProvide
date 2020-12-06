@@ -22,7 +22,7 @@ import AppKit
 
 internal class ImageCreate {
     static func image(from data: Data) -> PlatformImage? {
-        #if os(iOS)
+        #if os(iOS) || os(tvOS)
         return UIImage(data: data)
         #elseif os(macOS)
         return NSImage(data: data)
