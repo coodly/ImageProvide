@@ -66,7 +66,7 @@ internal class ActionsChain {
         }
         
         let saved: Data?
-        #if os(iOS)
+        #if os(iOS) || os(tvOS)
         switch data.imageContentType {
         case .jpg:
             saved = processed.jpegData(compressionQuality: 0.8)
